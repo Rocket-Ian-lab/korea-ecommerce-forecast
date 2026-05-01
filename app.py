@@ -652,59 +652,24 @@ with dc2:
         use_container_width=True)
 with dc3:
     if not REPORTLAB_OK:
-        st.warning("PDF 생성을 위해 reportlab을 설치하세요.")
+        st.warning("PDF 생성을 위한 라이브러리 오류")
     else:
-        if st.button("📄 PDF 보고서 생성", use_container_width=True, type="secondary"):
-            with st.spinner("PDF 보고서 생성 중..."):
-                try:
-                    pdf_bytes = generate_pdf_report(
-                        tbl, fstart, fend, mult,
-                        exp_ts, imp_ts,
-                        exp_fc_a, imp_fc_a,
-                        exp_lo, exp_hi,
-                        imp_lo, imp_hi,
-                    )
-                    # PDF 헤더 유효성 검증
-                    if not pdf_bytes or not pdf_bytes.startswith(b"%PDF-"):
-                        st.error("PDF 생성 실패: 유효하지 않은 PDF 파일입니다.")
-                    else:
-                        pdf_fn   = (
-                            f"ecommerce_forecast_"
-                            f"{fstart.strftime('%Y%m')}_{fend.strftime('%Y%m')}.pdf"
-                        )
-                        kb = len(pdf_bytes) / 1024
-                        st.session_state["pdf_bytes"] = pdf_bytes
-                        st.session_state["pdf_fn"]    = pdf_fn
-
-                        st.success(
-                            f"✅ PDF 생성 완료 ({kb:.0f} KB)"
-                        )
-                except Exception as e:
-                    import traceback
-                    st.error(f"PDF 생성 오류: {e}")
-                    st.code(traceback.format_exc(), language="python")
-
-# PDF 브라우저 다운로드 버튼
-if "pdf_bytes" in st.session_state:
-    pdf_fn   = st.session_state.get("pdf_fn",   "ecommerce_forecast_report.pdf")
-    if not pdf_fn.endswith(".pdf"):
-        pdf_fn += ".pdf"
-
-    st.download_button(
-        label=f"📥 브라우저로 다운로드 ({len(st.session_state['pdf_bytes'])//1024} KB)",
-        data=st.session_state["pdf_bytes"],
-        file_name=pdf_fn,
-        mime="application/octet-stream",
-        use_container_width=True,
-        type="primary",
-    )
-    
-    # PDF 앱 내 미리보기
-    with st.expander("👀 생성된 PDF 보고서 미리보기", expanded=True):
-        import base64
-        base64_pdf = base64.b64encode(st.session_state["pdf_bytes"]).decode('utf-8')
-        pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}#view=FitH" width="100%" height="800" type="application/pdf" style="border: 1px solid #334155; border-radius: 8px; margin-top: 10px;"></iframe>'
-        st.markdown(pdf_display, unsafe_allow_html=True)
+        pdf_bytes = generate_pdf_report(
+            tbl, fstart, fend, mult,
+            exp_ts, imp_ts,
+            exp_fc_a, imp_fc_a,
+            exp_lo, exp_hi,
+            imp_lo, imp_hi,
+        )
+        pdf_fn = f"ecommerce_forecast_{fstart.strftime('%Y%m')}_{fend.strftime('%Y%m')}.pdf"
+        st.download_button(
+            label=f"📥 PDF 다운로드 ({len(pdf_bytes)//1024} KB)",
+            data=pdf_bytes,
+            file_name=pdf_fn,
+            mime="application/pdf",
+            use_container_width=True,
+            type="secondary",
+        )
 
 # ── 푸터 ─────────────────────────────────────────────────────
 st.markdown("""
