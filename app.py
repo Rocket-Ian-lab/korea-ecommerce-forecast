@@ -668,73 +668,36 @@ with dc3:
                     if not pdf_bytes or not pdf_bytes.startswith(b"%PDF-"):
                         st.error("PDF 생성 실패: 유효하지 않은 PDF 파일입니다.")
                     else:
-                        # ① report/ 폴더에 저장
-                        SAVE_DIR = os.path.join(
-                            os.path.dirname(os.path.abspath(__file__)), "report"
-                        )
-                        os.makedirs(SAVE_DIR, exist_ok=True)
                         pdf_fn   = (
                             f"ecommerce_forecast_"
                             f"{fstart.strftime('%Y%m')}_{fend.strftime('%Y%m')}.pdf"
                         )
-                        save_path = os.path.join(SAVE_DIR, pdf_fn)
-                        with open(save_path, "wb") as f:
-                            f.write(pdf_bytes)
-
                         kb = len(pdf_bytes) / 1024
                         st.session_state["pdf_bytes"] = pdf_bytes
                         st.session_state["pdf_fn"]    = pdf_fn
-                        st.session_state["pdf_path"]  = save_path
 
                         st.success(
-                            f"✅ PDF 생성 완료 ({kb:.0f} KB)\n\n"
-                            f"📁 저장 위치: `{save_path}`"
+                            f"✅ PDF 생성 완료 ({kb:.0f} KB)"
                         )
                 except Exception as e:
                     import traceback
                     st.error(f"PDF 생성 오류: {e}")
                     st.code(traceback.format_exc(), language="python")
 
-# PDF 저장 경로 안내 + 다운로드 버튼
+# PDF 브라우저 다운로드 버튼
 if "pdf_bytes" in st.session_state:
     pdf_fn   = st.session_state.get("pdf_fn",   "ecommerce_forecast_report.pdf")
-    pdf_path = st.session_state.get("pdf_path", "")
     if not pdf_fn.endswith(".pdf"):
         pdf_fn += ".pdf"
 
-    # 저장 경로 강조 표시
-    if pdf_path:
-        st.info(
-            f"📂 **파일이 아래 경로에 저장되었습니다. 탐색기에서 바로 열어보세요.**\n\n"
-            f"`{pdf_path}`",
-            icon="📄"
-        )
-
-    # 브라우저 다운로드 버튼 및 로컬 열기 버튼
-    dl_col1, dl_col2 = st.columns(2)
-    with dl_col1:
-        st.download_button(
-            label=f"📥 브라우저로 다운로드 ({len(st.session_state['pdf_bytes'])//1024} KB)",
-            data=st.session_state["pdf_bytes"],
-            file_name=pdf_fn,
-            mime="application/octet-stream",
-            use_container_width=True,
-            type="primary",
-        )
-    with dl_col2:
-        if st.button("💻 로컬 PDF 뷰어로 바로 열기", use_container_width=True):
-            import os, platform
-            try:
-                if platform.system() == "Windows":
-                    os.startfile(pdf_path)
-                elif platform.system() == "Darwin":
-                    os.system(f'open "{pdf_path}"')
-                else:
-                    os.system(f'xdg-open "{pdf_path}"')
-            except Exception as e:
-                st.error(f"파일 열기 실패: {e}")
-
-    st.caption("💡 브라우저 다운로드가 안 될 경우 위 폴더 경로에서 직접 파일을 여세요.")
+    st.download_button(
+        label=f"📥 브라우저로 다운로드 ({len(st.session_state['pdf_bytes'])//1024} KB)",
+        data=st.session_state["pdf_bytes"],
+        file_name=pdf_fn,
+        mime="application/octet-stream",
+        use_container_width=True,
+        type="primary",
+    )
     
     # PDF 앱 내 미리보기
     with st.expander("👀 생성된 PDF 보고서 미리보기", expanded=True):
