@@ -31,8 +31,13 @@ try:
     import matplotlib.ticker as mticker
 
     # 한글 폰트 전역 등록 — 함수 내부가 아닌 모듈 로드 시 1회만 실행
-    _FONT_REG  = r"C:\Windows\Fonts\malgun.ttf"
-    _FONT_BOLD = r"C:\Windows\Fonts\malgunbd.ttf"
+    if os.path.exists(r"C:\Windows\Fonts\malgun.ttf"):
+        _FONT_REG  = r"C:\Windows\Fonts\malgun.ttf"
+        _FONT_BOLD = r"C:\Windows\Fonts\malgunbd.ttf"
+    else:
+        _FONT_REG = '/usr/share/fonts/truetype/nanum/NanumGothic.ttf'
+        _FONT_BOLD = '/usr/share/fonts/truetype/nanum/NanumGothicBold.ttf'
+
     _registered = pdfmetrics.getRegisteredFontNames()
     if "Malgun" not in _registered:
         pdfmetrics.registerFont(TTFont("Malgun",   _FONT_REG))
@@ -131,7 +136,10 @@ def generate_pdf_report(tbl: pd.DataFrame, fstart, fend, mult: float,
     # ── 차트 생성 (matplotlib → PNG → BytesIO) ────────────────
     def make_chart_image(exp_ts, imp_ts, exp_fc_a, imp_fc_a,
                          exp_lo, exp_hi, imp_lo, imp_hi, fstart):
-        plt.rcParams["font.family"] = "Malgun Gothic"
+        if os.path.exists(r"C:\Windows\Fonts\malgun.ttf"):
+            plt.rcParams["font.family"] = "Malgun Gothic"
+        else:
+            plt.rcParams["font.family"] = "NanumGothic"
         plt.rcParams["axes.unicode_minus"] = False
         fig, axes = plt.subplots(2, 1, figsize=(13, 7))
         fig.suptitle("전자상거래 수출입 예측 (SARIMAX + 이벤트 회귀)",
