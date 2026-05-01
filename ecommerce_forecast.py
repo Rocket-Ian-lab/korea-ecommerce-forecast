@@ -32,7 +32,7 @@ else:
     plt.rcParams['font.family'] = 'AppleGothic'
 plt.rcParams['axes.unicode_minus'] = False
 
-FILE_PATH = r'C:\Users\arron\Downloads\전자상거래무역.xlsx'
+FILE_PATH = r'전자상거래무역.xlsx'
 
 # ═══════════════════════════════════════════════════════════════
 # 1. 데이터 로드 및 전처리

@@ -408,7 +408,7 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif;}
 """, unsafe_allow_html=True)
 
 # ── 상수 ─────────────────────────────────────────────────────
-FILE_PATH = r"C:\Users\arron\Downloads\전자상거래무역.xlsx"
+FILE_PATH = r"전자상거래무역.xlsx"
 
 # ── 데이터 로드 ──────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
